@@ -1,26 +1,46 @@
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/[controller]")] 
+[Route("api/[controller]")]
 public class CategoryController : ControllerBase
 {
-    private static readonly List<Category> Categories = new()
+    private readonly ICategoryService _service;
+
+    public CategoryController(ICategoryService service)
     {
-        new Category { Id = 1, Name = "Струнные", ParentId = null },
-        new Category { Id = 2, Name = "Гитары", ParentId = 1 },
-        // Добавьте остальные категории
-    };
+        _service = service;
+    }
 
     [HttpGet]
-    public IActionResult GetCategories()
+    public async Task<IActionResult> GetCategories()
     {
-        return Ok(Categories);
+        return Ok(await _service.GetCategoriesAsync());
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetCategoryById(int id)
+    {
+        var category = await _service.GetCategoryByIdAsync(id);
+        return category != null ? Ok(category) : NotFound();
     }
 
     [HttpGet("{id}/children")]
-    public IActionResult GetChildCategories(int id)
+    public async Task<IActionResult> GetChildCategories(int id)
     {
-        var children = Categories.Where(c => c.ParentId == id).ToList();
-        return Ok(children);
+        return Ok(await _service.GetChildCategoriesAsync(id));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddCategory(Category category)
+    {
+        await _service.AddCategoryAsync(category);
+        return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteCategory(int id)
+    {
+        await _service.DeleteCategoryAsync(id);
+        return NoContent();
     }
 }

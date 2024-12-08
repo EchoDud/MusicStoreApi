@@ -4,27 +4,43 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class ProductController : ControllerBase
 {
-    private static readonly List<Product> Products = new()
+    private readonly IProductService _service;
+
+    public ProductController(IProductService service)
     {
-        new Product { Id = 1, Brand = "Fender", Model = "Player Stratocaster", Color = "Sunburst", Description = "Идеальный выбор для начинающих и профессионалов.", Price = 120000, ImageUrl = "https://images.musicstore.de/images/1280/fender-player-plus-stratocaster-hss-mn-3-color-sunburst_1_GIT0056958-000.jpg", CategoryId = 3 },
-        // Добавьте остальные продукты из моков
-    };
+        _service = service;
+    }
 
     [HttpGet]
-    public IActionResult GetProducts() => Ok(Products);
+    public async Task<IActionResult> GetProducts()
+    {
+        return Ok(await _service.GetProductsAsync());
+    }
 
     [HttpGet("{id}")]
-    public IActionResult GetProductById(int id)
+    public async Task<IActionResult> GetProductById(int id)
     {
-        var product = Products.FirstOrDefault(p => p.Id == id);
-        if (product == null) return NotFound();
-        return Ok(product);
+        var product = await _service.GetProductByIdAsync(id);
+        return product != null ? Ok(product) : NotFound();
     }
 
     [HttpGet("category/{categoryId}")]
-    public IActionResult GetProductsByCategory(int categoryId)
+    public async Task<IActionResult> GetProductsByCategory(int categoryId)
     {
-        var products = Products.Where(p => p.CategoryId == categoryId).ToList();
-        return Ok(products);
+        return Ok(await _service.GetProductsByCategoryAsync(categoryId));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddProduct(Product product)
+    {
+        await _service.AddProductAsync(product);
+        return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProduct(int id)
+    {
+        await _service.DeleteProductAsync(id);
+        return NoContent();
     }
 }
