@@ -1,10 +1,14 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Регистрация сервисов для Dependency Injection
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Подключение к SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -13,6 +17,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Настройка JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Secret"]))
+        };
+    });
 
 // Настройка CORS
 builder.Services.AddCors(options =>
@@ -40,13 +58,14 @@ app.UseCors("AllowAngularApp");
 
 app.UseRouting();
 
+// Подключение аутентификации и авторизации
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Регистрируем маршруты
 app.MapControllers();
 
-
 // Тестовое заполнение данных
-
-
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -55,7 +74,6 @@ using (var scope = app.Services.CreateScope())
     context.Database.EnsureDeleted(); // Удаляет существующую базу
     context.Database.EnsureCreated(); // Создаёт новую базу данных
 }
-
 
 using (var scope = app.Services.CreateScope())
 {
