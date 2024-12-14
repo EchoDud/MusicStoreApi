@@ -46,13 +46,17 @@ public class AuthController : ControllerBase
 
     private string GenerateJwtToken(User user)
     {
-        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"] ?? throw new ArgumentNullException("Jwt:Secret not found in configuration."));
+        var key = Encoding.ASCII.GetBytes(
+            _configuration["Jwt:Secret"]
+            ?? throw new ArgumentNullException("Jwt:Secret not found in configuration.")
+        );
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new System.Security.Claims.ClaimsIdentity(new[]
             {
+            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, user.Id.ToString()),
             new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, user.Email)
         }),
             Expires = DateTime.UtcNow.AddDays(7),
@@ -64,6 +68,7 @@ public class AuthController : ControllerBase
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
+
 }
 
 public record UserDto(string Email, string Password);

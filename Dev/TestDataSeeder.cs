@@ -44,7 +44,7 @@ public class TestDataSeeder
             Color = "Sunburst",
             Description = "Легендарная электрогитара.",
             Price = 120000,
-            ImageUrl = "https://example.com/images/stratocaster.jpg",
+            ImageUrl = "https://images.musicstore.de/images/1600/fender-player-ii-stratocaster-rw-3-color-sunburst_1_GIT0061901-001.jpg",
             CategoryId = guitarsCategory.Id
         };
         await _productService.AddProductAsync(product1);
@@ -56,7 +56,7 @@ public class TestDataSeeder
             Color = "Black",
             Description = "Полный комплект ударных.",
             Price = 85000,
-            ImageUrl = "https://example.com/images/imperialstar.jpg",
+            ImageUrl = "https://tama.ru/upload/resize_cache/iblock/82b/trlpm40afdq21i2ozp4csikfwsrjzrk7/800_0_1/A155679_318839_8.jpg",
             CategoryId = drumsCategory.Id
         };
         await _productService.AddProductAsync(product2);
