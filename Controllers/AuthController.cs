@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 
 
@@ -46,6 +47,7 @@ public class AuthController : ControllerBase
         return Ok(new { token });
     }
 
+
     private string GenerateJwtToken(User user)
     {
         var key = Encoding.ASCII.GetBytes(
@@ -72,8 +74,8 @@ public class AuthController : ControllerBase
         return tokenHandler.WriteToken(token);
     }
 
-    [HttpDelete("delete/{id}")]
-    [Authorize(Roles = "Admin")]
+    [HttpDelete("delete/{userId}")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> DeleteUser(int userId)
     {
         var success = await _userService.DeleteUserAsync(userId);
@@ -84,14 +86,17 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("all")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> GetAllUsers()
     {
         var users = await _userService.GetAllUsersAsync();
         return Ok(users);
     }
 
+
+
     [HttpPost("add")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> Add([FromBody] UserDto userDto)
     {
         try

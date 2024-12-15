@@ -32,7 +32,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPost("add")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> AddCategory(Category category)
     {
         await _service.AddCategoryAsync(category);
@@ -40,7 +40,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpDelete("delete/{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> DeleteCategory(int id)
     {
         await _service.DeleteCategoryAsync(id);

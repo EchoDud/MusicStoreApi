@@ -32,7 +32,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost("add")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> AddProduct(Product product)
     {
         await _service.AddProductAsync(product);
@@ -40,7 +40,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpDelete("delete/{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> DeleteProduct(int id)
     {
         await _service.DeleteProductAsync(id);

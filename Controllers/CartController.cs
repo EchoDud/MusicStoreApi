@@ -84,7 +84,7 @@ public class CartController : ControllerBase
     }
 
     [HttpGet("all-history")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> GetAllOrderHistory()
     {
         var orders = await _cartService.GetAllOrderHistoryAsync();
