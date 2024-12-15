@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -30,14 +31,16 @@ public class ProductController : ControllerBase
         return Ok(await _service.GetProductsByCategoryAsync(categoryId));
     }
 
-    [HttpPost]
+    [HttpPost("add")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddProduct(Product product)
     {
         await _service.AddProductAsync(product);
         return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("delete/{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteProduct(int id)
     {
         await _service.DeleteProductAsync(id);

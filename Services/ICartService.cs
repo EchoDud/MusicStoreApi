@@ -6,4 +6,5 @@ public interface ICartService
     Task RemoveItemAsync(int userId, int productId);
     Task CheckoutAsync(int userId);
     Task<IEnumerable<Order>> GetOrderHistoryAsync(int userId);
+    Task<IEnumerable<Order>> GetAllOrderHistoryAsync();
 }

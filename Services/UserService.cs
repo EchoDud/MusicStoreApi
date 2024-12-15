@@ -49,6 +49,11 @@ public class UserService : IUserService
         return true;
     }
 
+    public async Task<IEnumerable<User>> GetAllUsersAsync()
+    {
+        return await _context.Users.ToListAsync();
+    }
+
     private string HashPassword(string password)
     {
         using var sha256 = SHA256.Create();

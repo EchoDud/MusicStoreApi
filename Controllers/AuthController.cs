@@ -72,7 +72,7 @@ public class AuthController : ControllerBase
         return tokenHandler.WriteToken(token);
     }
 
-    [HttpDelete("delete-user/{userId}")]
+    [HttpDelete("delete/{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteUser(int userId)
     {
@@ -81,6 +81,29 @@ public class AuthController : ControllerBase
             return NotFound(new { error = "User not found" });
 
         return NoContent();
+    }
+
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var users = await _userService.GetAllUsersAsync();
+        return Ok(users);
+    }
+
+    [HttpPost("add")]
+    public async Task<IActionResult> Add([FromBody] UserDto userDto)
+    {
+        try
+        {
+            
+            var user = await _userService.RegisterAsync(userDto.Email, userDto.Password, userDto.Role ?? "Client");
+            return Ok(new { user.Email });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 }
 

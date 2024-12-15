@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -80,6 +81,14 @@ public class CartController : ControllerBase
             order.Status,
             order.CreatedDate
         }));
+    }
+
+    [HttpGet("all-history")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAllOrderHistory()
+    {
+        var orders = await _cartService.GetAllOrderHistoryAsync();
+        return Ok(orders);
     }
 
     private int GetUserId()

@@ -84,6 +84,15 @@ public class CartService : ICartService
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Order>> GetAllOrderHistoryAsync()
+    {
+        return await _context.Orders
+            .Include(order => order.Product)
+            .Include(order => order.UserId)
+            .Where(order => order.Status != "Pending")
+            .ToListAsync();
+    }
+
     public async Task CheckoutAsync(int userId)
     {
         var orders = await _context.Orders

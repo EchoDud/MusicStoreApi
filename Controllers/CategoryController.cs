@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -30,14 +31,16 @@ public class CategoryController : ControllerBase
         return Ok(await _service.GetChildCategoriesAsync(id));
     }
 
-    [HttpPost]
+    [HttpPost("add")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddCategory(Category category)
     {
         await _service.AddCategoryAsync(category);
         return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("delete/{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteCategory(int id)
     {
         await _service.DeleteCategoryAsync(id);
