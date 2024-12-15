@@ -10,4 +10,8 @@ public class User
 
     [Required]
     public string PasswordHash { get; set; } = null!;
+
+    [Required]
+    [MaxLength(50)]
+    public string Role { get; set; } = "Client"; // Роль по умолчанию: клиент
 }

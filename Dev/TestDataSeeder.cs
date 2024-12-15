@@ -1,15 +1,18 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 public class TestDataSeeder
 {
     private readonly ICategoryService _categoryService;
     private readonly IProductService _productService;
+    private readonly IUserService _userService;
 
-    public TestDataSeeder(ICategoryService categoryService, IProductService productService)
+    public TestDataSeeder(ICategoryService categoryService, IProductService productService, IUserService userService)
     {
         _categoryService = categoryService;
         _productService = productService;
+        _userService = userService;
     }
 
     public async Task SeedDataAsync()
@@ -62,5 +65,15 @@ public class TestDataSeeder
         await _productService.AddProductAsync(product2);
 
         Console.WriteLine("Продукты созданы.");
+
+        var admin1 = new User
+        {
+            Email = "admin@mail.com",
+            PasswordHash = "password",
+            Role = "Admin"
+        };
+
+        await  _userService.RegisterAsync(admin1.Email,admin1.PasswordHash,admin1.Role);
+
     }
 }

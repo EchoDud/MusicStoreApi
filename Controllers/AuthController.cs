@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 
 
@@ -24,7 +25,8 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var user = await _userService.RegisterAsync(userDto.Email, userDto.Password);
+            // Роль при регистрации всегда "Client"
+            var user = await _userService.RegisterAsync(userDto.Email, userDto.Password, "Client");
             return Ok(new { user.Email });
         }
         catch (Exception ex)
@@ -56,9 +58,10 @@ public class AuthController : ControllerBase
         {
             Subject = new System.Security.Claims.ClaimsIdentity(new[]
             {
-            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, user.Email)
-        }),
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, user.Email),
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, user.Role) // Добавляем роль в токен
+            }),
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
@@ -69,6 +72,17 @@ public class AuthController : ControllerBase
         return tokenHandler.WriteToken(token);
     }
 
+    [HttpDelete("delete-user/{userId}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteUser(int userId)
+    {
+        var success = await _userService.DeleteUserAsync(userId);
+        if (!success)
+            return NotFound(new { error = "User not found" });
+
+        return NoContent();
+    }
 }
 
-public record UserDto(string Email, string Password);
+public record UserDto(string Email, string Password, string? Role = null);
+

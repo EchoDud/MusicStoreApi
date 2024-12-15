@@ -33,6 +33,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
+
 // Настройка CORS
 builder.Services.AddCors(options =>
 {
@@ -80,7 +85,8 @@ using (var scope = app.Services.CreateScope())
 {
     var seeder = new TestDataSeeder(
         scope.ServiceProvider.GetRequiredService<ICategoryService>(),
-        scope.ServiceProvider.GetRequiredService<IProductService>()
+        scope.ServiceProvider.GetRequiredService<IProductService>(),
+        scope.ServiceProvider.GetRequiredService<IUserService>()
     );
     await seeder.SeedDataAsync();
 }

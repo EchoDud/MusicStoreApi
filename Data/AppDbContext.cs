@@ -20,10 +20,13 @@ public class AppDbContext : DbContext
         .HasForeignKey(p => p.CategoryId)
         .OnDelete(DeleteBehavior.Cascade);
 
-        // ”никальность email дл€ пользовател€
         modelBuilder.Entity<User>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
+        .HasIndex(u => u.Email)
+        .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.Role)
+            .HasDefaultValue("Client");
 
         modelBuilder.Entity<Order>()
             .HasOne(o => o.Product)

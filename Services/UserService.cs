@@ -21,7 +21,7 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<User> RegisterAsync(string email, string password)
+    public async Task<User> RegisterAsync(string email, string password, string role)
     {
         if (await _context.Users.AnyAsync(u => u.Email == email))
             throw new InvalidOperationException("User with this email already exists.");
@@ -29,7 +29,8 @@ public class UserService : IUserService
         var user = new User
         {
             Email = email,
-            PasswordHash = HashPassword(password)
+            PasswordHash = HashPassword(password),
+            Role = role
         };
 
         _context.Users.Add(user);
