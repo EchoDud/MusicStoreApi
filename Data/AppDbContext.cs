@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MusicStoreApi.Models;
 
 public class AppDbContext : DbContext
 {
@@ -8,6 +9,7 @@ public class AppDbContext : DbContext
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<VisitStat> VisitStats { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -43,5 +45,17 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Order>()
             .Property(o => o.Status)
             .HasDefaultValue("Pending");
+
+
+        modelBuilder.Entity<VisitStat>()
+        .HasKey(vs => vs.Id);
+
+        modelBuilder.Entity<VisitStat>()
+            .Property(vs => vs.Month)
+            .IsRequired();
+
+        modelBuilder.Entity<VisitStat>()
+            .Property(vs => vs.VisitsCount)
+            .HasDefaultValue(0);
     }
 }

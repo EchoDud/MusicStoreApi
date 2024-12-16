@@ -1,3 +1,4 @@
+using MusicStoreApi.Services;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -7,12 +8,14 @@ public class TestDataSeeder
     private readonly ICategoryService _categoryService;
     private readonly IProductService _productService;
     private readonly IUserService _userService;
+    private readonly IVisitStatService _visitStatService;
 
-    public TestDataSeeder(ICategoryService categoryService, IProductService productService, IUserService userService)
+    public TestDataSeeder(ICategoryService categoryService, IProductService productService, IUserService userService, IVisitStatService visitStatService)
     {
         _categoryService = categoryService;
         _productService = productService;
         _userService = userService;
+        _visitStatService = visitStatService;
     }
 
     public async Task SeedDataAsync()
@@ -75,5 +78,29 @@ public class TestDataSeeder
 
         await  _userService.RegisterAsync(admin1.Email,admin1.PasswordHash,admin1.Role);
 
+        await AddVisitStatsForLastMonthsAsync();
+
+    }
+
+    private async Task AddVisitStatsForLastMonthsAsync()
+    {
+        var currentDate = DateTime.Now;
+
+        // Генерируем статистику для текущего месяца
+        var currentMonthVisits = new Random().Next(1000, 5000); // Генерация случайного числа посещений для текущего месяца
+        await _visitStatService.AddOrUpdateStatAsync(currentDate, currentMonthVisits);
+        Console.WriteLine($"Добавлены данные о посещениях за {currentDate:MMMM yyyy}: {currentMonthVisits} посещений.");
+
+        // Генерируем статистику за последние 7 месяцев (предыдущие)
+        for (int i = 1; i <= 7; i++)
+        {
+            var month = currentDate.AddMonths(-i); // Получаем дату для месяца
+            var visits = new Random().Next(1000, 5000); // Генерируем случайное число посещений
+
+            // Используем существующий метод для добавления или обновления статистики
+            await _visitStatService.AddOrUpdateStatAsync(month, visits);
+
+            Console.WriteLine($"Добавлены данные о посещениях за {month:MMMM yyyy}: {visits} посещений.");
+        }
     }
 }

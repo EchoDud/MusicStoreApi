@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using MusicStoreApi.Middleware;
+using MusicStoreApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IVisitStatService, VisitStatService>();
 
 // Подключение к SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -63,6 +66,8 @@ app.UseCors("AllowAngularApp");
 
 app.UseRouting();
 
+app.UseMiddleware<VisitStatMiddleware>();
+
 // Подключение аутентификации и авторизации
 app.UseAuthentication();
 app.UseAuthorization();
@@ -85,7 +90,8 @@ using (var scope = app.Services.CreateScope())
     var seeder = new TestDataSeeder(
         scope.ServiceProvider.GetRequiredService<ICategoryService>(),
         scope.ServiceProvider.GetRequiredService<IProductService>(),
-        scope.ServiceProvider.GetRequiredService<IUserService>()
+        scope.ServiceProvider.GetRequiredService<IUserService>(),
+        scope.ServiceProvider.GetRequiredService<IVisitStatService>()
     );
     await seeder.SeedDataAsync();
 }
